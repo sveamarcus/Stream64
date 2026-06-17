@@ -37,10 +37,13 @@ func gcsBitstream(deltas: [UInt64], p: Int) -> [UInt8] {
     var bits: [Bool] = []
     for delta in deltas {
         var quotient = delta >> UInt64(p)
-        while quotient > 0 { bits.append(true); quotient -= 1 }   // unary 1s
-        bits.append(false)                                        // 0 terminator
+        while quotient > 0 {
+            bits.append(true)
+            quotient -= 1
+        }  // unary 1s
+        bits.append(false)  // 0 terminator
         let lower = delta & mask
-        for shift in stride(from: p - 1, through: 0, by: -1) {    // p bits, MSB-first
+        for shift in stride(from: p - 1, through: 0, by: -1) {  // p bits, MSB-first
             bits.append((lower >> UInt64(shift)) & 1 == 1)
         }
     }
@@ -50,8 +53,12 @@ func gcsBitstream(deltas: [UInt64], p: Int) -> [UInt8] {
     for bit in bits {
         current = (current << 1) | (bit ? 1 : 0)
         filled += 1
-        if filled == 8 { bytes.append(current); current = 0; filled = 0 }
+        if filled == 8 {
+            bytes.append(current)
+            current = 0
+            filled = 0
+        }
     }
-    if filled > 0 { bytes.append(current << (8 - filled)) }       // pad final byte MSB-first
+    if filled > 0 { bytes.append(current << (8 - filled)) }  // pad final byte MSB-first
     return bytes
 }

@@ -72,10 +72,11 @@ public struct StreamIterator: IteratorProtocol {
         return self.stream64.data.withUnsafeBufferPointer {
             guard let base = $0.baseAddress
             else { return 0 }
-            return read_p(base,
-                          $0.count,
-                          self.stream64.p,
-                          &self.state)
+            return read_p(
+                base,
+                $0.count,
+                self.stream64.p,
+                &self.state)
         }
     }
 }
@@ -96,7 +97,9 @@ public extension Stream64 {
 
         return try Array(unsafeUninitializedCapacity: bytesCountCeil) { buffer, setSizeTo in
             let cRet = values.withUnsafeBufferPointer { values in
-                write_bitstream(values.baseAddress!, values.count, p, buffer.baseAddress, buffer.count, &setSizeTo)
+                write_bitstream(
+                    values.baseAddress!, values.count, p, buffer.baseAddress, buffer.count,
+                    &setSizeTo)
             }
             guard cRet == 0
             else { throw Stream64Error.illegalInput }

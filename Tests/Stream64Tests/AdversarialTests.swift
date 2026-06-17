@@ -26,7 +26,8 @@ import Testing
         // Tiny payload, huge declared element count: rejected up front by the
         // Swift `n <= count*8` memory-exhaustion guard (never allocates n UInt64s).
         #expect(client.decode(compressed: [0, 0, 0, 0], n: 100_000, p: 19) == nil)
-        #expect(client.decode(compressed: [UInt8](repeating: 0xFF, count: 32), n: 10_000, p: 19) == nil)
+        #expect(
+            client.decode(compressed: [UInt8](repeating: 0xFF, count: 32), n: 10_000, p: 19) == nil)
     }
 
     @Test func decodeOversizedNWithinGuardStopsViaCBoundsCheck() {
@@ -36,7 +37,7 @@ import Testing
         // it. If the C bounds-check were reverted this would over-read the buffer
         // (caught under ASan); with it, decode fails cleanly.
         let encoded = client.encode(sorted: [1, 2, 3, 100, 524_288], p: 19)!
-        let oversized = encoded.count * 8           // the largest n the guard allows
+        let oversized = encoded.count * 8  // the largest n the guard allows
         #expect(client.decode(compressed: encoded, n: oversized, p: 19) == nil)
         // All-ones payload (no terminator) with n at the guard limit: must
         // terminate via zero-pad + truncation, never loop or over-read.
@@ -108,7 +109,10 @@ import Testing
         // exercise the clz bulk-unary boundary and the all-ones clz(0) case.
         let quotients: [UInt64] = [0, 1, 62, 63, 64, 65, 126, 127, 128, 129, 191, 192, 300, 1000]
         var acc: UInt64 = 0
-        let input: [UInt64] = quotients.map { q in acc &+= (q << 19) &+ (q & 0x7FFFF); return acc }
+        let input: [UInt64] = quotients.map { q in
+            acc &+= (q << 19) &+ (q & 0x7FFFF)
+            return acc
+        }
         let encoded = try #require(client.encode(sorted: input, p: 19))
         #expect(client.decode(compressed: encoded, n: input.count, p: 19) == input)
     }

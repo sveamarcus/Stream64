@@ -59,8 +59,10 @@ import Testing
         let input = (0..<count).map { _ in UInt64.random(in: 0...maxValue) }
 
         let result = try Stream64.streamWrite(values: input, p: p)
-        let stream64 = p > 7 ? Stream64(data: result, p: p)
-                             : Stream64(data: result, count: input.count, p: p)
+        let stream64 =
+            p > 7
+            ? Stream64(data: result, p: p)
+            : Stream64(data: result, count: input.count, p: p)
 
         let all = [UInt64](stream64)
         #expect(all.count == input.count)
